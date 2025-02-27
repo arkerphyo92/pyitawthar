@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "business",
     "silk",
+    "ninja_extra"
+
 ]
 
 MIDDLEWARE = [

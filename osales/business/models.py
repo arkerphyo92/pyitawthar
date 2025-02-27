@@ -32,6 +32,7 @@ class User(AbstractUser):
 class TimestampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -69,6 +70,7 @@ class Product(TimestampedModel):
     weight_type = models.CharField(max_length=20, choices=WeightTypeChoices.choices, default=WeightTypeChoices.KG)
     exchange_rate = models.ForeignKey(ExchangeRate, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, choices=ProductStatusChoices.choices, default=ProductStatusChoices.AVAILABLE, )
+    sold = models.PositiveIntegerField(default=0)
 
     @property
     def in_stock(self):
@@ -88,8 +90,7 @@ class Product(TimestampedModel):
         verbose_name_plural = "Products"
 
 
-class Price(models.Model):
-    
+class Price(models.Model):    
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name="prices")
     
     retail_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -137,6 +138,32 @@ class Discount(TimestampedModel):
     class Meta:
         verbose_name_plural = "Discounts"
 
+
+class ProductReview(TimestampedModel):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField()
+    review = models.TextField()
+
+    def __str__(self):
+        return f"{self.user.username} - Review of {self.product.name}"
+    
+    class Meta:
+        verbose_name_plural = "Product Reviews"
+    
+
+class ProductImage(TimestampedModel):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="product_images/")
+    alt_test = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"Image of {self.product.name}"
+    
+    class Meta:
+        verbose_name_plural = "Product Images"
+
+
 class Order(TimestampedModel):    
     
     order_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -163,16 +190,7 @@ class OrderItem(TimestampedModel):
     class Meta:
         verbose_name_plural = "Order Items"
 
-class ProductImage(TimestampedModel):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to="product_images/")
-    alt_test = models.CharField(max_length=255, blank=True, null=True)
 
-    def __str__(self):
-        return f"Image of {self.product.name}"
-    
-    class Meta:
-        verbose_name_plural = "Product Images"
 
 
 class UserCart(TimestampedModel):
