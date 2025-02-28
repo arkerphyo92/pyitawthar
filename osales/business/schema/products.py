@@ -62,6 +62,11 @@ class SingleProductSchemaOut(Schema):
     prices: PriceSchemaOut | None = None
     discounts: DiscountsSchemaOut | None = None
     images: list[ProductImageSchema]
+    user: str
+
+    @staticmethod
+    def resolve_user(obj):
+        return obj.user.username
 
     @staticmethod
     def resolve_category(obj):
