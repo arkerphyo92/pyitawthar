@@ -10,8 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,13 +45,16 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "business",
     "silk",
-    "ninja_extra"
+    'ninja_jwt',
+    "ninja_extra",
+    "corsheaders",
 
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -148,6 +155,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "business.user"
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+CORS_ALLOWED_ORIGINS= ["http://localhost:3000"]
+
+NINJASECRET_KEY = os.getenv("SECRET_KEY")
+
+NINJA_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': NINJASECRET_KEY,
+    }
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)

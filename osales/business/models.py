@@ -90,7 +90,7 @@ class Product(TimestampedModel):
         verbose_name_plural = "Products"
 
 
-class Price(models.Model):    
+class Price(TimestampedModel):    
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name="prices")
     
     retail_price = models.DecimalField(max_digits=10, decimal_places=2)

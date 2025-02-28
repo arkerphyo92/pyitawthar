@@ -15,7 +15,7 @@ from typing import List
 productsapi = Router(tags=["Products"])
 
 
-@productsapi.post("/list", response=list[ProductListSchema])
+@productsapi.get("/list", response=list[ProductListSchema])
 @paginate(PageNumberPagination, page_size=10)
 def product_list(request, filters: ProductFilterSchema = Query(...)):
     products = Product.objects.all()
@@ -39,16 +39,12 @@ def create_product(request, payload: SingleProductSchemaIn, file: List[UploadedF
                 product_obj['exchange_rate'] = product_exchange_rate
 
             user = get_object_or_404(User, id=request.auth.id)
-            # print("Auth User", request.auth)
-            # print("Auth Id", request.auth.id)
             product_obj['user'] = user
-            # prices_obj['user'] = request.auth.id
-            # discounts_obj['user'] = user
 
             product = Product.objects.create(**product_obj)
 
             if prices_obj:
-                Price.objects.create(**prices_obj, product=product, user=request.auth.id)
+                Price.objects.create(**prices_obj, product=product, user=request.auth)
 
             if discounts_obj:
                 Discount.objects.create(**discounts_obj, product=product)
