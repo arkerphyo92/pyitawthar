@@ -6,7 +6,7 @@ from business.schema.categories import CategorySchemaOut
 
 categoriesapi = Router(tags=["Categories"])
 
-@categoriesapi.post("/list", response=list[CategorySchemaOut])
+@categoriesapi.get("/list", response=list[CategorySchemaOut])
 @paginate(PageNumberPagination, page_size=10)
 def product_category_list(request):
     product_categories = ProductCategory.objects.all()
