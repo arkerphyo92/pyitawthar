@@ -6,7 +6,6 @@ from pydantic import Field
 class CategorySchema(Schema):
     name: str
 
-
 class ProductImageSchema(Schema):
     image: str
 
@@ -30,21 +29,24 @@ class PriceSchemaOut(Schema):
     wholesale_price: float | None
     retail_price_with_discount: float | None = None
     wholesale_price_with_discount: float | None = None
+    retail_pay_type: str
+    wholesale_pay_type: str | None
 
 
 class ProductListSchema(Schema):
     id: int
     name: str
     category: str
-    stock: float | None
     status: str
     in_stock: bool | None
     prices: PriceSchemaOut | None
     images: list[ProductImageSchema]
+    discounts: DiscountsSchemaOut | None = None
 
     @staticmethod
     def resolve_category(obj):
         return obj.category.name if obj.category else "No Category"
+    
 
 
 class SingleProductSchemaOut(Schema):
@@ -54,8 +56,6 @@ class SingleProductSchemaOut(Schema):
     category: str
     stock: float | None
     stock_type: str
-    weight: float | None
-    weight_type: str
     status: str
     in_stock: bool
     sold: int

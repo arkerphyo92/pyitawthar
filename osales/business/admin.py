@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CartItem, ProductImage, User, Order, OrderItem, Product, ProductCategory, Discount, ExchangeRate, Price, UserCart
+from .models import CartItem, CategoryImage, ProductImage, User, Order, OrderItem, Product, ProductCategory, Discount, ExchangeRate, Price, UserCart
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.templatetags.static import static
@@ -91,9 +91,13 @@ class ProductAdmin(admin.ModelAdmin):
     
 admin.site.register(Product, ProductAdmin)
 
+class CategoryImageInline(admin.TabularInline):
+    model = CategoryImage
+
 class CategoryAdmin(admin.ModelAdmin):
-    # list_display = ['name', 'description', 'created_at']
-    # search_fields = ['name']
+    inlines = [
+        CategoryImageInline,
+        ]
     list_per_page = settings.LIST_PER_PAGE
 
 admin.site.register(ProductCategory, CategoryAdmin)

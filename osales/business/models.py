@@ -6,25 +6,25 @@ import uuid
 # Create your models here.
 
 class PayTypeChoices(models.TextChoices):
-        KG = "Kilograms"
-        GRAM = "Grams"
-        PCS = "Pieces"
+        KG = "kg"
+        GRAM = "g"
+        PCS = "pcs"
         SET = "Sets"
         DOZEN = "Dozen"
 
 class WeightTypeChoices(models.TextChoices):
-        KG = "Kilograms"
-        GRAM = "Grams"
+        KG = "kg"
+        GRAM = "g"
 
 class ProductStatusChoices(models.TextChoices):
         AVAILABLE = "Available"
         UNAVAILABLE = "Unavailable"
 
 class OrderStatusChoices(models.TextChoices):
-        CONFIRMED = "Order Confimed by Customer"
-        APPROVED = "Order Approved by Moderator"
-        COMPLETED = "Order Completed"
-        CANCELLED = "Order Cancelled"
+        CONFIRMED = "Confirmed"
+        APPROVED = "Approved"
+        COMPLETED = "Completed"
+        CANCELLED = "Cancelled"
 
 class User(AbstractUser):
     pass
@@ -48,6 +48,17 @@ class ProductCategory(TimestampedModel):
     class Meta:
         verbose_name_plural = "Product Categories"
 
+class CategoryImage(TimestampedModel):
+    product_category = models.OneToOneField(ProductCategory, on_delete=models.CASCADE, related_name='categoryimages')
+    image = models.ImageField(upload_to="category_images/")
+    alt_text = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"Image of {self.product_category.name}"
+    
+    class Meta:
+        verbose_name_plural = "Product Images"
+
 class ExchangeRate(TimestampedModel):
     exchange_rate = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3)
@@ -66,8 +77,6 @@ class Product(TimestampedModel):
     arrival_date = models.DateField(auto_now_add=True)
     stock = models.PositiveIntegerField()
     stock_type = models.CharField(max_length=20, choices=PayTypeChoices.choices, default=PayTypeChoices.PCS)
-    weight = models.PositiveIntegerField(default=0)
-    weight_type = models.CharField(max_length=20, choices=WeightTypeChoices.choices, default=WeightTypeChoices.KG)
     exchange_rate = models.ForeignKey(ExchangeRate, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, choices=ProductStatusChoices.choices, default=ProductStatusChoices.AVAILABLE, )
     sold = models.PositiveIntegerField(default=0)
@@ -75,13 +84,6 @@ class Product(TimestampedModel):
     @property
     def in_stock(self):
         return self.stock > 0
-    
-    
-    def save(self, *args, **kwargs):        
-        if self.weight_type == "Pcs":
-            raise ValidationError(
-                "Pcs is not allowed in here")
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -155,7 +157,7 @@ class ProductReview(TimestampedModel):
 class ProductImage(TimestampedModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to="product_images/")
-    alt_test = models.CharField(max_length=255, blank=True, null=True)
+    alt_text = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Image of {self.product.name}"
