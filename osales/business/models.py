@@ -72,7 +72,7 @@ class ExchangeRate(TimestampedModel):
 
 class Product(TimestampedModel):
     name = models.CharField(max_length=200)
-    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, related_name="products")
     description = models.TextField()
     arrival_date = models.DateField(auto_now_add=True)
     stock = models.PositiveIntegerField()

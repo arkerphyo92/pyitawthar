@@ -6,6 +6,7 @@ class CategorySchemaOut(Schema):
     description: str
     parent: int | None
     cat_image: str | None = None
+    products_count: int | None = 0 
 
     @staticmethod
     def resolve_cat_image(obj):
@@ -14,3 +15,14 @@ class CategorySchemaOut(Schema):
     @staticmethod
     def resolve_parent(obj):
         return obj.parent.id if obj.parent else 0
+
+    @staticmethod
+    def resolve_products_count(obj):
+        all_data = obj.products if obj.products else None
+        total_products = all_data.count()
+
+        subcategories = obj.subcategories.all() if obj.subcategories else []
+        for subcategory in subcategories:
+            total_products += subcategory.products.count()
+        
+        return total_products
