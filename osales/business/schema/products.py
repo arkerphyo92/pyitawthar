@@ -98,7 +98,7 @@ class SingleProductSchemaIn(Schema):
 
 
 class ProductFilterSchema(FilterSchema):
-    category: int | None = None
+    category: str | None = None
 
 
 class ReviewShemaOut(Schema):
