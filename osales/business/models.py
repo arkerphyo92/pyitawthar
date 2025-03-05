@@ -38,7 +38,7 @@ class TimestampedModel(models.Model):
         abstract = True
     
 class ProductCategory(TimestampedModel):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     description = models.TextField()
     parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="subcategories")
 
