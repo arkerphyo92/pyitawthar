@@ -1,7 +1,7 @@
 import datetime
 from ninja import FilterSchema, Schema
 from pydantic import Field
-
+from business.models import ProductCategory, ProductImage
 
 class CategorySchema(Schema):
     name: str
@@ -45,10 +45,12 @@ class ProductListSchema(Schema):
 
     @staticmethod
     def resolve_category(obj):
-        return obj.category.name if obj.category else "No Category"
+        if obj.category:
+            parent = obj.category.parent.name if obj.category.parent else "No Parent"
+            return f"{parent} -> {obj.category.name}" if parent else obj.category.name
+        return "No Category"
+
     
-
-
 class SingleProductSchemaOut(Schema):
     id: int
     name: str
@@ -98,7 +100,20 @@ class SingleProductSchemaIn(Schema):
 
 
 class ProductFilterSchema(FilterSchema):
-    category: str | None = None
+    category_name: str | None = Field(None, q="category__name__iexact",title="Category Filter",
+        description="Filter products by category name (case-insensitive)")
+
+    def filter(self, queryset):
+        if self.category_name:
+            parent_category = ProductCategory.objects.filter(name__iexact=self.category_name).first()
+            if parent_category:
+                sub_categories_ids = parent_category.subcategories.values_list("id", flat=True)
+                queryset = queryset.filter(category__in=[parent_category.id]+list(sub_categories_ids))
+            else:
+                queryset = queryset.filter(category=None)
+        return queryset
+
+
 
 
 class ReviewShemaOut(Schema):
