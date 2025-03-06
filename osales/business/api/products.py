@@ -18,9 +18,7 @@ productsapi = Router(tags=["Products"])
 @productsapi.get("/list", response=list[ProductListSchema])
 @paginate(PageNumberPagination, page_size=10)
 def product_list(request, filters: ProductFilterSchema = Query(...)):
-    products = Product.objects.all()
-    products = filters.filter(products)
-    return products
+    return filters.filter(Product.objects.all().select_related('category'))
 
 @productsapi.post("/product", response=SingleProductSchemaOut, auth=JWTAuth())
 def create_product(request, payload: SingleProductSchemaIn, file: List[UploadedFile] = File(...)):
