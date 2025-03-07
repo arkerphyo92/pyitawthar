@@ -47,7 +47,7 @@ class ProductListSchema(Schema):
     def resolve_category(obj):
         if obj.category:
             parent = obj.category.parent.name if obj.category.parent else "No Parent"
-            return f"{parent} -> {obj.category.name}" if parent else obj.category.name
+            return f"{obj.category.name}" if parent else obj.category.name
         return "No Category"
 
     
