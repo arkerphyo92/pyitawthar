@@ -3,3 +3,4 @@ osales/db.sqlite3
 ./osales/db.sqlite3
 testing.html
 .env
+osales\db.sqlite3
