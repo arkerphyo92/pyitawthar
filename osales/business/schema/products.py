@@ -36,6 +36,7 @@ class PriceSchemaOut(Schema):
 class ProductListSchema(Schema):
     id: int
     name: str
+    description: str
     category: str
     status: str
     in_stock: bool | None
@@ -100,6 +101,7 @@ class SingleProductSchemaIn(Schema):
 
 
 class ProductFilterSchema(FilterSchema):
+    search: str | None = Field(None, q=['name__icontains', 'category__name__icontains'])
     category_name: str | None = Field(None, q="category__name__iexact",title="Category Filter",
         description="Filter products by category name (case-insensitive)")
 
@@ -111,6 +113,10 @@ class ProductFilterSchema(FilterSchema):
                 queryset = queryset.filter(category__in=[parent_category.id]+list(sub_categories_ids))
             else:
                 queryset = queryset.filter(category=None)
+
+        if self.search:
+            queryset = queryset.filter(name__icontains=self.search) | queryset.filter(category__name__icontains=self.search)
+            
         return queryset
 
 
